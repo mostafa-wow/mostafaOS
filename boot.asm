@@ -1,9 +1,57 @@
 [org 0x7c00]
+[bits 16]
+
+KERNEL_LOCATION equ 0x1000
+DATA_SEGMENT_OFFSET equ 0x10
+CODE_SEGMENT_OFFSET equ 0x08
+
+
+mov [disk_num],dl
+mov ax,0
+mov es,ax
+
+mov ah,2
+mov al,4
+mov ch,0
+mov cl,2
+mov dh,0
+mov dl,[disk_num]
+mov bx,KERNEL_LOCATION
+int 0x13
+
+mov ah,0x0
+mov al,0x3
+int 0x10
 
 
 
+cli
+lgdt [gdt_descriptor]
+mov eax,cr0
+or eax,1
+mov cr0,eax
+
+jmp CODE_SEGMENT_OFFSET:protected_mode_start
+
+[bits 32]
+protected_mode_start:
+    mov ax,DATA_SEGMENT_OFFSET
+    mov ds,ax
+    mov es,ax
+    mov fs,ax
+    mov gs,ax
+    mov ss,ax
+    mov sp,ax
 
 
+    mov al,'M'
+    mov ah,0x0f
+    mov word [0xb8000],ax
+    
+    jmp KERNEL_LOCATION
+
+
+disk_num: db 0
 
 gdt:
     dq 0x0000000000000000
