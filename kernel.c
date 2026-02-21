@@ -8,8 +8,8 @@ uint16_t *vga_text_buffer = (uint16_t *)0xb8000;
 uint8_t current_active_row = 0;
 uint8_t current_active_column = 0;
 
-static inline void outb(uint16_t port, uint8_t value) {
-  __asm__ volatile("outb %0, %1" : : "a"(value), "Nd"(port) : "memory");
+static inline void outb(uint16_t port, uint8_t val) {
+  __asm__ volatile("outb %b0, %w1" : : "a"(val), "Nd"(port) : "memory");
 }
 
 void update_cursor(int x, int y) {
@@ -48,13 +48,8 @@ void kprint(uint8_t *s, uint8_t colour) {
 
 void kernel_main() {
   kprint("mostafaOS\n", 0x0F);
-  kprint("mostafaOS\n", 0x0F);
-  kprint("mostafaOS\n", 0x0F);
-  kprint("mostafaOS\n", 0x0F);
-  kprint("mostafaOS\n", 0x0F);
-  kprint("mostafaOS\n", 0x0F);
-  kprint("mostafaOS\n", 0x0F);
-  kprint("mostafaOS\n", 0x0F);
-  kprint("mostafaOS\n", 0x0F);
+  kprint("I'm feeling like my  old self again. Renewed. Recharged. Refocused. "
+         "With nothing to stop me from being me.",
+         0xF4);
   return;
 }
