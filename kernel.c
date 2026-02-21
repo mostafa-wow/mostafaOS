@@ -48,7 +48,7 @@ void kprint(uint8_t *s, uint8_t colour) {
 
 void kernel_main() {
   kprint("mostafaOS\n", 0x0F);
-  kprint("I'm feeling like my  old self again. Renewed. Recharged. Refocused. "
+  kprint("This is my new self, Renewed. Recharged. Refocused. "
          "With nothing to stop me from being me.",
          0xF4);
   return;
