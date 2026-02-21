@@ -11,7 +11,7 @@ mov ax,0
 mov es,ax
 
 mov ah,2
-mov al,4
+mov al,KERNEL_SECTORS
 mov ch,0
 mov cl,2
 mov dh,0
@@ -42,7 +42,9 @@ protected_mode_start:
     mov gs,ax
     mov ss,ax
     mov sp,ax
-
+    
+    mov ebp,0x9fc00
+    mov esp,ebp
 
     jmp KERNEL_LOCATION
 
