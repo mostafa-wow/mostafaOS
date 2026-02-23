@@ -22,6 +22,11 @@ void update_cursor(int x, int y) {
 }
 
 void kputc(uint8_t c, uint8_t colour, uint8_t x, uint8_t y) {
+  if (c == '\n') {
+    current_active_column++;
+    current_active_row = 0;
+    return;
+  }
   uint16_t pos = (y * VGA_WIDTH) + x;
   vga_text_buffer[pos] = c | (colour << 8);
 }
@@ -29,12 +34,6 @@ void kputc(uint8_t c, uint8_t colour, uint8_t x, uint8_t y) {
 void kprint(uint8_t *s, uint8_t colour) {
   uint32_t i = 0;
   while (s[i] != 0) {
-    if (s[i] == '\n') {
-      current_active_row = 0;
-      current_active_column++;
-      i++;
-      continue;
-    }
     kputc(s[i], colour, current_active_row, current_active_column);
     i++;
     current_active_row++;
