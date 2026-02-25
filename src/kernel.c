@@ -1,34 +1,34 @@
-#include <stdint.h>
+#include "include/types.h"
 
 #define PORT 0x3f8
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25
 
-uint16_t *vga_text_buffer = (uint16_t *)0xb8000;
+u16 *vga_text_buffer = (u16 *)0xb8000;
 
-uint8_t current_active_row = 0;
-uint8_t current_active_column = 0;
+u8 current_active_row = 0;
+u8 current_active_column = 0;
 
-static inline void outb(uint16_t port, uint8_t val) {
+static inline void outb(u16 port, u8 val) {
   __asm__ volatile("outb %b0, %w1" : : "a"(val), "Nd"(port) : "memory");
 }
 
-static inline uint8_t inb(uint16_t port) {
-  uint8_t ret;
+static inline u8 inb(u16 port) {
+  u8 ret;
   __asm__ volatile("inb %w1, %b0" : "=a"(ret) : "Nd"(port) : "memory");
   return ret;
 }
 
-char *itoa(int value, char *result, int base) {
+u8 *itoa(s32 value, u8 *result, s32 base) {
   // check that the base if valid
   if (base < 2 || base > 36) {
     *result = '\0';
     return result;
   }
 
-  char *ptr = result, *ptr1 = result, tmp_char;
-  int tmp_value;
+  u8 *ptr = result, *ptr1 = result, tmp_char;
+  s32 tmp_value;
 
   do {
     tmp_value = value;
@@ -50,26 +50,26 @@ char *itoa(int value, char *result, int base) {
 }
 
 void update_cursor(int x, int y) {
-  uint16_t pos = y * VGA_WIDTH + x;
+  u16 pos = y * VGA_WIDTH + x;
 
   outb(0x3D4, 0x0F);
-  outb(0x3D5, (uint8_t)(pos & 0xFF));
+  outb(0x3D5, (u8)(pos & 0xFF));
   outb(0x3D4, 0x0E);
-  outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+  outb(0x3D5, (u8)((pos >> 8) & 0xFF));
 }
 
-void kputc(uint8_t c, uint8_t colour, uint8_t x, uint8_t y) {
+void kputc(u8 c, u8 colour, u8 x, u8 y) {
   if (c == '\n') {
     current_active_column++;
     current_active_row = 0;
     return;
   }
-  uint16_t pos = (y * VGA_WIDTH) + x;
+  u16 pos = (y * VGA_WIDTH) + x;
   vga_text_buffer[pos] = c | (colour << 8);
 }
 
-void kprint(uint8_t *s, uint8_t colour) {
-  uint32_t i = 0;
+void kprint(u8 *s, u8 colour) {
+  u32 i = 0;
   while (s[i] != 0) {
     kputc(s[i], colour, current_active_row, current_active_column);
     i++;
@@ -105,26 +105,26 @@ int8_t serial_init() {
   return 0;
 }
 
-int32_t serial_received() { return inb(PORT + 5) & 1; }
+s32 serial_received() { return inb(PORT + 5) & 1; }
 
-uint8_t read_serial() {
+u8 read_serial() {
   while (serial_received() == 0)
     ;
 
   return inb(PORT);
 }
 
-int32_t is_transmit_empty() { return inb(PORT + 5) & 0x20; }
+s32 is_transmit_empty() { return inb(PORT + 5) & 0x20; }
 
-void write_serial(char a) {
+void write_serial(u8 a) {
   while (is_transmit_empty() == 0)
     ;
 
   outb(PORT, a);
 }
 
-void serial_print(char *s) {
-  int32_t i = 0;
+void serial_print(u8 *s) {
+  s32 i = 0;
   while (s[i] != 0) {
     write_serial(s[i]);
     i++;
@@ -132,25 +132,25 @@ void serial_print(char *s) {
 }
 
 void kernel_main() {
-  kprint("mostafaOS\n", 0x0F);
-  kprint("This is my new self, Renewed. Recharged. Refocused. "
-         "With nothing to stop me from being me.\n",
+  kprint((u8 *)"mostafaOS\n", 0x0F);
+  kprint((u8 *)"This is my new self, Renewed. Recharged. Refocused. "
+               "With nothing to stop me from being me.\n",
          0xF4);
 
-  kprint("value:", 0x0F);
-  char num1[32];
+  kprint((u8 *)"value:", 0x0F);
+  u8 num1[32];
   itoa(67, num1, 10);
   kprint(num1, 0x0F);
 
-  kprint("\n", 0x0);
+  kprint((u8 *)"\n", 0x0);
 
-  kprint("value:", 0x0F);
-  char num2[32];
+  kprint((u8 *)"value:", 0x0F);
+  u8 num2[32];
   itoa(0x7c00, num2, 16);
   kprint(num2, 0x0F);
 
   serial_init();
-  serial_print("mostafaOS\n");
+  serial_print((u8 *)"mostafaOS\n");
 
   return;
 }

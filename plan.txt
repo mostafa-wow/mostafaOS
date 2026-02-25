@@ -1,6 +1,6 @@
 1- kprint() | done
 2- Decimal numbers and hex-decimal numbers to str | done
-3- Output to serial port
+3- Output to serial port | done
 4- Interrupt handling system
 5- Memory map plan
 6- malloc & free
